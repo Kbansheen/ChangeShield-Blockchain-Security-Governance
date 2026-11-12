@@ -131,37 +131,39 @@ These scenarios demonstrate both successful authorization and the system's abili
 | Configuration Storage | JSON |
 | Development Environment | Visual Studio Code |
 
+
 ## Project Structure
 
 ```text
 ChangeShield/
-â”‚
-â”œâ”€â”€ contracts/
-â”‚   â””â”€â”€ ChangeShield.sol
-â”‚
-â”œâ”€â”€ scripts/
-â”‚   â””â”€â”€ deploy-changeshield.ts
-â”‚
-â”œâ”€â”€ test/
-â”‚   â””â”€â”€ ChangeShield.ts
-â”‚
-â”œâ”€â”€ backend/
-â”‚   â”œâ”€â”€ server.mjs
-â”‚   â”œâ”€â”€ public/
-â”‚   â”‚   â”œâ”€â”€ index.html
-â”‚   â”‚   â”œâ”€â”€ styles.css
-â”‚   â”‚   â””â”€â”€ app.js
-â”‚   â””â”€â”€ data/
-â”‚       â””â”€â”€ config.json
-â”‚
-â”œâ”€â”€ Run-ChangeShield-Demo.ps1
-â”œâ”€â”€ hardhat.config.ts
-â”œâ”€â”€ package.json
-â”œâ”€â”€ package-lock.json
-â”œâ”€â”€ tsconfig.json
-â”œâ”€â”€ .gitignore
-â””â”€â”€ README.md
+|
+|-- contracts/
+|   `-- ChangeShield.sol
+|
+|-- scripts/
+|   `-- deploy-changeshield.ts
+|
+|-- test/
+|   `-- ChangeShield.ts
+|
+|-- backend/
+|   |-- server.mjs
+|   |-- public/
+|   |   |-- index.html
+|   |   |-- styles.css
+|   |   `-- app.js
+|   `-- data/
+|       `-- config.json
+|
+|-- Run-ChangeShield-Demo.ps1
+|-- hardhat.config.ts
+|-- package.json
+|-- package-lock.json
+|-- tsconfig.json
+|-- .gitignore
+`-- README.md
 ```
+
 
 **Generated locally when the application is deployed or run:**
 
