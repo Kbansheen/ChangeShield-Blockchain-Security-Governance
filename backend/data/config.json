@@ -1,0 +1,5 @@
+{
+  "requireMFA": true,
+  "maxLoginAttempts": 4,
+  "firewallMode": "strict"
+}

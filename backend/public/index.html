@@ -1,0 +1,428 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChangeShield | Security Change Management</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">C</div>
+        <div>
+          <h1>ChangeShield</h1>
+          <span>Blockchain Security</span>
+        </div>
+      </div>
+
+      <div class="side-label">WORKSPACE</div>
+      <nav class="navigation">
+        <button class="nav-link active" data-section="overview">Overview</button>
+        <button class="nav-link" data-section="proposals">Change Proposals</button>
+        <button class="nav-link" data-section="scenarios">Demo Scenarios</button>
+        <button class="nav-link" data-section="audit">Blockchain Audit</button>
+        <button class="nav-link" data-section="architecture">Architecture</button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="network-indicator">
+          <span class="status-dot" id="sidebarDot"></span>
+          <div>
+            <strong id="sidebarNetwork">Connecting...</strong>
+            <small>Local blockchain</small>
+          </div>
+        </div>
+        <small class="sidebar-note">Academic demonstration environment</small>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">SECURE CONFIGURATION GOVERNANCE</div>
+          <h2 id="pageTitle">Overview</h2>
+        </div>
+        <div class="topbar-actions">
+          <span class="network-pill" id="networkPill">Checking network...</span>
+          <button class="button button-secondary" id="refreshButton">Refresh data</button>
+        </div>
+      </header>
+
+      <div id="globalMessage" class="global-message hidden"></div>
+
+      <!-- OVERVIEW -->
+      <section class="page-section active" id="section-overview">
+        <div class="welcome-panel">
+          <div>
+            <div class="eyebrow light">BLOCKCHAIN-BASED CHANGE CONTROL</div>
+            <h3>Two-person authorization.<br>One verifiable audit trail.</h3>
+            <p>
+              ChangeShield protects critical security configuration changes
+              through proposal, independent approval, controlled execution
+              and blockchain-backed auditing.
+            </p>
+          </div>
+          <div class="welcome-symbol">⬡</div>
+        </div>
+
+        <div class="stats-grid">
+          <article class="stat-card">
+            <span class="stat-label">Blockchain status</span>
+            <strong id="healthStatus">Loading...</strong>
+            <small id="blockNumber">Block: --</small>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">Total proposals</span>
+            <strong id="totalProposals">--</strong>
+            <small>Recorded on-chain</small>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">Executed changes</span>
+            <strong id="executedCount">--</strong>
+            <small>Successfully applied</small>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">Audit events</span>
+            <strong id="auditCount">--</strong>
+            <small>Blockchain events</small>
+          </article>
+        </div>
+
+        <div class="content-grid">
+          <article class="panel">
+            <div class="panel-heading">
+              <div>
+                <span class="eyebrow">LIVE SYSTEM STATE</span>
+                <h3>Current security configuration</h3>
+              </div>
+              <span class="live-label">LIVE</span>
+            </div>
+            <div id="configDisplay" class="config-list">
+              <p class="muted">Loading configuration...</p>
+            </div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-heading">
+              <div>
+                <span class="eyebrow">SMART CONTRACT</span>
+                <h3>Blockchain connection</h3>
+              </div>
+            </div>
+            <div class="detail-list">
+              <div><span>Network</span><strong id="networkName">--</strong></div>
+              <div><span>Chain ID</span><strong id="chainId">--</strong></div>
+              <div class="address-row">
+                <span>Contract address</span>
+                <code id="contractAddress">--</code>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <article class="panel">
+          <div class="panel-heading">
+            <div>
+              <span class="eyebrow">RECENT ACTIVITY</span>
+              <h3>Latest proposals</h3>
+            </div>
+            <button class="text-button" data-go="proposals">View all proposals →</button>
+          </div>
+          <div id="recentProposals" class="table-wrap">
+            <p class="muted">Loading proposals...</p>
+          </div>
+        </article>
+      </section>
+
+      <!-- PROPOSALS -->
+      <section class="page-section" id="section-proposals">
+        <div class="section-intro">
+          <div>
+            <span class="eyebrow">PROPOSAL AND APPROVAL WORKFLOW</span>
+            <h3>Manage security changes</h3>
+            <p>Create a proposal as Admin A, review it as Admin B, and execute it through the backend executor.</p>
+          </div>
+        </div>
+
+        <div class="workflow-strip">
+          <div><span>01</span><strong>Propose</strong><small>Admin A</small></div>
+          <div><span>02</span><strong>Approve / Reject</strong><small>Admin B</small></div>
+          <div><span>03</span><strong>Execute</strong><small>Backend executor</small></div>
+          <div><span>04</span><strong>Audit</strong><small>Blockchain events</small></div>
+        </div>
+
+        <div class="content-grid proposal-grid">
+          <article class="panel">
+            <div class="panel-heading">
+              <div>
+                <span class="eyebrow">ADMINISTRATOR A</span>
+                <h3>Create a change proposal</h3>
+              </div>
+              <span class="role-tag">PROPOSER</span>
+            </div>
+
+            <form id="proposalForm">
+              <label for="changeReason">Reason for change</label>
+              <textarea id="changeReason" minlength="3" maxlength="500" required placeholder="Explain why this security configuration change is needed..."></textarea>
+
+              <label for="settingName">Configuration setting</label>
+              <select id="settingName">
+                <option value="requireMFA">Require MFA</option>
+                <option value="maxLoginAttempts">Maximum login attempts</option>
+                <option value="firewallMode">Firewall mode</option>
+                <option value="invalidSetting">Unsupported setting (validation test)</option>
+              </select>
+
+              <div id="booleanValueGroup">
+                <label for="booleanValue">New value</label>
+                <select id="booleanValue">
+                  <option value="true">Enabled (true)</option>
+                  <option value="false">Disabled (false)</option>
+                </select>
+              </div>
+
+              <div id="numberValueGroup" class="hidden">
+                <label for="numberValue">New value (1–20)</label>
+                <input id="numberValue" type="number" min="1" max="20" value="3">
+              </div>
+
+              <div id="firewallValueGroup" class="hidden">
+                <label for="firewallValue">New firewall mode</label>
+                <select id="firewallValue">
+                  <option value="standard">Standard</option>
+                  <option value="strict">Strict</option>
+                  <option value="restricted">Restricted</option>
+                </select>
+              </div>
+
+              <div id="invalidValueGroup" class="hidden">
+                <label>Validation test input</label>
+                <div class="info-note">
+                  <strong>Unsupported setting:</strong>
+                  <code>disableSecurityMonitoring = true</code>
+                  <p>This input should be rejected by backend validation before a blockchain proposal is created.</p>
+                </div>
+              </div>
+
+              <label for="validity">Proposal validity</label>
+              <select id="validity">
+                <option value="60">1 minute</option>
+                <option value="3600">1 hour</option>
+                <option value="86400" selected>24 hours</option>
+                <option value="604800">7 days</option>
+              </select>
+
+              <button id="proposalSubmitButton" class="button button-primary full-width" type="submit">Submit proposal to blockchain</button>
+            </form>
+            <div id="proposalResult" class="action-result hidden"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-heading">
+              <div>
+                <span class="eyebrow">CURRENT CONFIGURATION</span>
+                <h3>Before and after</h3>
+              </div>
+            </div>
+            <div id="proposalConfigPreview" class="config-list">
+              <p class="muted">Loading configuration...</p>
+            </div>
+            <div class="info-note">
+              <strong>Important:</strong> Creating a proposal does not change the active configuration. The change is applied only after independent approval and successful blockchain execution.
+            </div>
+          </article>
+        </div>
+
+        <article class="panel">
+          <div class="panel-heading">
+            <div>
+              <span class="eyebrow">ON-CHAIN RECORDS</span>
+              <h3>All change proposals</h3>
+            </div>
+            <button class="button button-secondary" id="proposalRefresh">Refresh</button>
+          </div>
+          <div id="proposalTable" class="table-wrap">
+            <p class="muted">Loading proposals...</p>
+          </div>
+        </article>
+      </section>
+
+      <!-- SCENARIOS -->
+      <section class="page-section" id="section-scenarios">
+        <div class="section-intro">
+          <div>
+            <span class="eyebrow">PROJECT DEMONSTRATION</span>
+            <h3>Four security scenarios</h3>
+            <p>These scenarios demonstrate the system's authorization, execution, expiry and validation controls.</p>
+          </div>
+        </div>
+
+        <div class="scenario-grid">
+          <article class="scenario-card">
+            <div class="scenario-number">01</div>
+            <span class="scenario-status success">SUCCESSFUL FLOW</span>
+            <h3>Authorized change</h3>
+            <p>Admin A proposes a valid configuration update. Admin B independently approves it. The executor records execution on-chain and the backend applies the new configuration.</p>
+            <div class="scenario-flow">Propose → Approve → Execute</div>
+            <div id="scenario1Evidence" class="scenario-evidence">Evidence will load from blockchain records.</div>
+          </article>
+
+          <article class="scenario-card">
+            <div class="scenario-number">02</div>
+            <span class="scenario-status danger">REJECTED CHANGE</span>
+            <h3>Administrator rejection</h3>
+            <p>Admin A submits a proposal, but Admin B rejects it. The proposed configuration is not applied.</p>
+            <div class="scenario-flow">Propose → Reject → No execution</div>
+            <div id="scenario2Evidence" class="scenario-evidence">Evidence will load from blockchain records.</div>
+          </article>
+
+          <article class="scenario-card">
+            <div class="scenario-number">03</div>
+            <span class="scenario-status warning">AUTOMATIC EXPIRY</span>
+            <h3>Expired proposal</h3>
+            <p>A proposal remains unapproved until its deadline passes. The backend's expiry monitor detects it and records the expired status on the blockchain.</p>
+            <div class="scenario-flow">Propose → Deadline passes → Expire</div>
+            <div id="scenario3Evidence" class="scenario-evidence">Evidence will load from blockchain records.</div>
+          </article>
+
+          <article class="scenario-card">
+            <div class="scenario-number">04</div>
+            <span class="scenario-status neutral">VALIDATION CONTROL</span>
+            <h3>Invalid configuration</h3>
+            <p>An unsupported configuration key is submitted. Backend validation rejects it before a blockchain proposal is created.</p>
+            <div class="scenario-flow">Invalid input → Rejected by backend</div>
+            <div id="scenario4Evidence" class="scenario-evidence">Validation evidence will appear here.</div>
+            <button class="button button-secondary full-width" id="invalidDemoButton">Run invalid-change demonstration</button>
+            <div id="invalidDemoResult" class="action-result hidden"></div>
+          </article>
+        </div>
+
+        <div class="info-note">
+          <strong>Presentation note:</strong> The four cards explain the previously demonstrated test cases. Their evidence is loaded from the current blockchain and backend state where available. Scenario 4 is a backend validation test, not an on-chain event.
+        </div>
+      </section>
+
+      <!-- AUDIT -->
+      <section class="page-section" id="section-audit">
+        <div class="section-intro">
+          <div>
+            <span class="eyebrow">TRANSPARENCY AND ACCOUNTABILITY</span>
+            <h3>Blockchain audit trail</h3>
+            <p>Chronological events retrieved from the deployed local ChangeShield smart contract.</p>
+          </div>
+          <button class="button button-secondary" id="auditRefresh">Refresh audit</button>
+        </div>
+
+        <div class="stats-grid audit-stats">
+          <article class="stat-card">
+            <span class="stat-label">Total events</span>
+            <strong id="auditTotal">--</strong>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">Latest block</span>
+            <strong id="auditLatestBlock">--</strong>
+          </article>
+        </div>
+
+        <article class="panel">
+          <div id="auditTable" class="table-wrap">
+            <p class="muted">Loading blockchain events...</p>
+          </div>
+        </article>
+      </section>
+
+      <!-- ARCHITECTURE -->
+      <section class="page-section" id="section-architecture">
+        <div class="section-intro">
+          <div>
+            <span class="eyebrow">SYSTEM DESIGN</span>
+            <h3>How ChangeShield works</h3>
+            <p>A hybrid architecture combines blockchain authorization with controlled off-chain configuration management.</p>
+          </div>
+        </div>
+
+        <article class="panel architecture-panel">
+          <div class="architecture-flow">
+
+            <div class="architecture-node">
+              <span>01 · ADMIN A</span>
+              <strong>Creates a change proposal</strong>
+            </div>
+
+            <div class="architecture-arrow">↓</div>
+
+            <div class="architecture-node">
+              <span>02 · EXPRESS BACKEND</span>
+              <strong>Validates input and calculates configuration hash</strong>
+            </div>
+
+            <div class="architecture-arrow">↓</div>
+
+            <div class="architecture-node blockchain-node">
+              <span>03 · CHANGESHIELD SMART CONTRACT</span>
+              <strong>Stores proposal, approval, rejection, expiry and execution events</strong>
+            </div>
+
+            <div class="architecture-arrow">↓</div>
+
+            <div class="architecture-node">
+              <span>04 · ADMIN B</span>
+              <strong>Independently approves or rejects the proposal</strong>
+            </div>
+
+            <div class="architecture-arrow">↓</div>
+
+            <div class="architecture-node">
+              <span>05 · BACKEND EXECUTOR</span>
+              <strong>Verifies the approved proposal and executes it on-chain</strong>
+            </div>
+
+            <div class="architecture-arrow">↓</div>
+
+            <div class="architecture-node blockchain-node">
+              <span>06 · CONFIGURATION FILE</span>
+              <strong>Updated only after confirmed blockchain execution</strong>
+            </div>
+
+          </div>
+        </article>
+
+        <div class="content-grid">
+          <article class="panel">
+            <h3>Security controls</h3>
+            <ul class="feature-list">
+              <li>Two-person approval for critical changes</li>
+              <li>Prevention of self-approval</li>
+              <li>Configuration hash verification</li>
+              <li>Execution restricted to the authorized executor</li>
+              <li>Proposal deadlines and automatic expiry</li>
+              <li>Protection against duplicate execution</li>
+              <li>Blockchain event-based audit history</li>
+            </ul>
+          </article>
+          <article class="panel">
+            <h3>Technology stack</h3>
+            <div class="technology-list">
+              <span>Solidity</span><span>Hardhat</span><span>Ethereum</span>
+              <span>Node.js</span><span>Express.js</span><span>Ethers.js</span>
+              <span>HTML</span><span>CSS</span><span>JavaScript</span>
+            </div>
+            <div class="info-note">
+              This is a local academic demonstration. Admin identities are represented by configured development blockchain accounts; this is not a production login or identity-management system.
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <span>ChangeShield · Blockchain-based security configuration governance</span>
+        <span>Local demonstration environment</span>
+      </footer>
+    </main>
+  </div>
+</body>
+</html>
