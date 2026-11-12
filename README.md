@@ -1,77 +1,140 @@
 # ChangeShield
-## Blockchain-Based Two-Person Authorization and Audit System for Critical Configuration Changes
 
-### 1. Project Overview
+### Blockchain-Based Security Configuration Change Governance
 
-ChangeShield is a blockchain-based security configuration management system designed to prevent unauthorized or unilateral modifications to critical system configurations.
+**A two-person authorization and tamper-evident audit framework for critical security configuration changes.**
 
-The system introduces a two-person authorization mechanism in which one authorized administrator proposes a configuration change and a different administrator independently approves or rejects it. Only an approved proposal can be executed by the designated backend executor.
+ChangeShield is a blockchain-backed prototype designed to introduce accountability and controlled authorization into sensitive security configuration changes. It uses a two-person approval workflow in which one administrator proposes a change and another independently reviews and approves or rejects it.
 
-The project uses Solidity smart contracts to enforce authorization rules and maintain tamper-evident records of configuration-change activities.
+Smart contracts enforce the authorization and proposal lifecycle, while a Node.js backend validates configuration changes, coordinates blockchain transactions, and updates the active configuration only after successful on-chain execution.
 
-The backend is developed using Node.js, Express.js, and ethers.js, while Hardhat provides the local blockchain development and testing environment.
+---
 
-### 2. Problem Statement
+## Overview
 
-Critical security configurations, such as authentication policies, login-attempt limits, and firewall settings, must be protected against unauthorized modifications.
+In systems that manage sensitive security settings, allowing a single administrator to initiate and authorize a change can create opportunities for misuse, unauthorized modifications, or accidental configuration changes.
 
-A system in which one administrator can independently propose and approve a sensitive change creates a risk of misuse or accidental modification.
+ChangeShield addresses this challenge through a structured governance workflow:
 
-ChangeShield addresses this problem through:
+- **Separation of duties:** The administrator who creates a proposal cannot approve their own request.
+- **Smart-contract authorization:** Critical proposal operations are governed by Solidity-based access controls.
+- **Configuration integrity:** Cryptographic hashes are used to verify the proposed configuration.
+- **Time-bound proposals:** Pending changes have an expiry deadline.
+- **Controlled execution:** Approved changes are executed through a designated backend executor.
+- **Auditability:** Important operations are recorded through blockchain events.
 
-- Two-person authorization.
-- Role-based access restrictions.
-- Cryptographic configuration hash verification.
-- Time-limited configuration-change proposals.
-- Controlled execution of approved changes.
-- Blockchain-based audit records.
+The project currently runs as a local prototype using a Hardhat development blockchain.
 
-### 3. System Architecture
+## Key Features
 
-The system consists of three main components.
+| Feature | Description |
+|---|---|
+| Two-person authorization | Requires a separate administrator to approve a proposed change. |
+| Role-based access control | Restricts sensitive operations to authorized blockchain accounts. |
+| Configuration validation | Checks proposed settings and rejects unsupported or invalid values. |
+| Hash verification | Verifies the proposed configuration against its approved cryptographic hash. |
+| Proposal lifecycle | Supports Pending, Approved, Rejected, Executed, and Expired states. |
+| Automatic expiry | Periodically checks and expires overdue proposals. |
+| Controlled execution | Applies configuration changes only after successful blockchain execution. |
+| Blockchain audit trail | Records important administrative and proposal events. |
+| Transaction management | Serializes backend executor transactions to reduce nonce conflicts. |
 
-**Smart Contract Layer**
-- Written in Solidity.
-- Manages administrator permissions.
+## System Architecture
+
+ChangeShield consists of three main layers.
+
+### 1. Smart Contract Layer
+**Solidity · Hardhat**
+
+- Maintains administrator and executor permissions.
 - Registers configuration-change proposals.
-- Enforces separate proposal and approval accounts.
-- Validates configuration hashes.
-- Controls execution and proposal expiry.
-- Emits blockchain events for important operations.
+- Enforces independent approval.
+- Controls proposal rejection, expiry, and execution.
+- Verifies configuration hashes.
+- Emits events for important operations.
 
-**Backend Layer**
-- Developed using Node.js and Express.js.
-- Exposes REST API endpoints.
-- Connects to the smart contract using ethers.js.
-- Validates proposed configuration changes.
-- Calculates cryptographic configuration hashes.
-- Applies approved changes to the configuration file.
+### 2. Backend Layer
+**Node.js · Express.js · ethers.js**
+
+- Provides REST API endpoints.
+- Validates incoming configuration-change requests.
+- Computes cryptographic configuration hashes.
+- Coordinates administrator and executor transactions.
+- Updates the active configuration after confirmed execution.
+- Monitors proposal expiry.
 - Retrieves blockchain audit events.
 
-**Storage Layer**
-- `config.json`: Stores the current demonstration configuration.
-- `changes.json`: Stores proposal descriptions and additional off-chain metadata.
-- Hardhat blockchain: Stores proposal records, statuses, hashes, and smart-contract events.
+### 3. Configuration and Metadata Layer
+**JSON · Local Hardhat Blockchain**
 
-### 4. Technology Stack
+- `config.json` stores the active demonstration configuration.
+- `changes.json` stores supplementary proposal information off-chain.
+- The blockchain stores proposal state, configuration hashes, and transaction events.
 
-| Component | Technology |
+### Architecture Diagram
+
+```mermaid
+flowchart TD
+    A["Administrator A<br/>Proposes a Change"] --> B["Node.js / Express Backend"]
+    B --> C{"Configuration Validation"}
+    C -->|Invalid| D["Request Rejected"]
+    C -->|Valid| E["Calculate Configuration Hash"]
+    E --> F["ChangeShield Smart Contract"]
+    F --> G["Administrator B<br/>Independent Review"]
+    G -->|Reject| H["Proposal Rejected"]
+    G -->|Approve| I["Proposal Approved"]
+    I --> J["Authorized Backend Executor"]
+    J --> K["Smart Contract Execution"]
+    K --> L["Update Active Configuration"]
+    K --> M["Blockchain Audit Events"]
+```
+
+## How It Works
+
+The configuration-change lifecycle follows these steps:
+
+1. **Proposal creation:** Administrator A submits a change request with a reason, proposed settings, and validity period.
+2. **Backend validation:** The backend checks whether the requested settings and values are permitted.
+3. **Hash generation:** A cryptographic hash is calculated for the complete proposed configuration.
+4. **On-chain registration:** The proposal and its hash are registered through the ChangeShield smart contract.
+5. **Independent review:** Administrator B reviews the request and approves or rejects it.
+6. **Controlled execution:** If approved, the designated backend executor submits the execution transaction.
+7. **Configuration update:** The backend updates `config.json` only after successful blockchain execution.
+8. **Audit recording:** The corresponding blockchain events remain available for audit.
+
+If a proposal is rejected or expires, it cannot proceed through the normal execution workflow.
+
+## Demonstration Scenarios
+
+The application includes four demonstration scenarios to illustrate the governance and validation mechanisms.
+
+| Scenario | Demonstration | Expected Result |
+|---|---|---|
+| 1. Successful change | A proposal is created, independently approved, and executed. | Configuration updated and execution recorded on-chain. |
+| 2. Administrator rejection | A second administrator rejects a pending proposal. | Proposal marked Rejected; configuration remains unchanged. |
+| 3. Automatic expiry | A proposal remains pending or approved beyond its validity period. | Proposal automatically marked Expired. |
+| 4. Invalid configuration | A request contains an unsupported configuration parameter. | Request rejected before blockchain proposal creation. |
+
+These scenarios demonstrate both successful authorization and the system's ability to prevent invalid or unauthorized configuration changes.
+
+## Technology Stack
+
+| Layer | Technologies |
 |---|---|
-| Smart Contracts | Solidity |
+| Smart Contracts | Solidity 0.8.34 |
 | Blockchain Development | Hardhat 3 |
-| Backend | Node.js |
+| Backend Runtime | Node.js |
 | API Framework | Express.js |
-| Blockchain Integration | ethers.js |
+| Blockchain Integration | ethers.js 6 |
 | Testing | Mocha, Chai, Hardhat |
-| Programming Languages | Solidity, JavaScript, TypeScript |
+| Frontend | HTML, CSS, JavaScript |
 | Configuration Storage | JSON |
 | Development Environment | Visual Studio Code |
-| API Testing | PowerShell / Postman |
 
-### 5. Project Structure
+## Project Structure
 
 ```text
-changeshield/
+ChangeShield/
 │
 ├── contracts/
 │   └── ChangeShield.sol
@@ -82,243 +145,258 @@ changeshield/
 ├── test/
 │   └── ChangeShield.ts
 │
-├── deployments/
-│   └── local.json
-│
 ├── backend/
 │   ├── server.mjs
+│   ├── public/
+│   │   ├── index.html
+│   │   ├── styles.css
+│   │   └── app.js
 │   └── data/
-│       ├── config.json
-│       └── changes.json
+│       └── config.json
 │
 ├── Run-ChangeShield-Demo.ps1
+├── hardhat.config.ts
 ├── package.json
 ├── package-lock.json
-├── hardhat.config.ts
 ├── tsconfig.json
-├── README.md
-└── .gitignore
+├── .gitignore
+└── README.md
 ```
 
-Generated folders such as `artifacts`, `cache`, and `node_modules` may also exist locally.
+**Generated locally when the application is deployed or run:**
 
-### 6. Core Functionalities
+- `artifacts/` and `cache/` — generated Hardhat build files.
+- `deployments/local.json` — local deployment information.
+- `backend/data/changes.json` — supplementary proposal metadata.
+- `.env` — local environment configuration.
+- `node_modules/` — installed dependencies.
 
-**6.1 Administrator Management**
+These local files are excluded from version control where appropriate.
 
-The smart contract allows authorized administrators to be registered and removed. Sensitive functions are restricted to authorized accounts.
+## Getting Started
 
-**6.2 Configuration-Change Proposal**
+### Prerequisites
 
-Administrator A submits a proposed configuration change. The backend validates the requested settings and computes a cryptographic hash of the proposed configuration.
+Install the following before setting up the project:
 
-**6.3 Independent Approval**
+- Node.js 22.13 or later
+- npm
+- Git
+- Visual Studio Code (recommended)
 
-Administrator B reviews the proposal. The smart contract prevents the original proposer from approving their own request.
+### 1. Clone the Repository
 
-**6.4 Proposal Rejection**
-
-An authorized administrator other than the proposer can reject a pending proposal.
-
-**6.5 Controlled Execution**
-
-The designated backend executor can execute an approved proposal only when the submitted configuration hash matches the approved hash.
-
-The backend applies the corresponding configuration update after successful blockchain execution.
-
-**6.6 Proposal Expiry**
-
-Proposals have an expiry deadline. The backend's automatic expiry checker identifies overdue proposals and submits expiry transactions. The smart contract independently enforces the deadline.
-
-**6.7 Blockchain Audit History**
-
-The smart contract emits events for important operations, including:
-
-- AdminUpdated
-- ExecutorUpdated
-- ChangeProposed
-- ChangeApproved
-- ChangeRejected
-- ChangeExpired
-- ChangeExecuted
-
-The backend provides an API to retrieve these blockchain events.
-
-### 7. Example Application
-
-The system demonstrates privileged-account security configuration management.
-
-The initial configuration may contain:
-
-```json
-{
-  "requireMFA": true,
-  "maxLoginAttempts": 5,
-  "firewallMode": "strict"
-}
+```powershell
+git clone https://github.com/Kbansheen/ChangeShield-Blockchain-Security-Governance.git
 ```
 
-Example situation:
+Navigate to the project directory:
 
-Repeated failed login attempts are detected against privileged accounts.
+```powershell
+cd ChangeShield-Blockchain-Security-Governance
+```
 
-Administrator A proposes reducing the maximum permitted login attempts from five to three.
-
-Administrator B independently reviews the request and approves it.
-
-The backend executor applies the approved configuration, and the blockchain records the execution event.
-
-Other demonstration scenarios include:
-
-- Rejection of an unsafe configuration change.
-- Automatic expiry of a proposal that misses its approval deadline.
-- Rejection of unsupported configuration parameters.
-- Prevention of unauthorized and repeated execution attempts.
-
-### 8. Installation and Setup
-
-**Prerequisites**
-
-- Node.js 22.13 or later.
-- npm.
-- Visual Studio Code.
-
-Clone or extract the project and open its root directory in the terminal.
-
-Install dependencies:
+### 2. Install Dependencies
 
 ```powershell
 npm install
 ```
 
-Build the smart contracts:
+### 3. Build the Smart Contracts
 
 ```powershell
 npx hardhat build
 ```
 
-Run automated tests:
+### 4. Run the Test Suite
 
 ```powershell
 npx hardhat test
 ```
 
-### 9. Environment Configuration
+The test suite contains 10 smart-contract tests covering proposal creation, independent approval, access restrictions, hash verification, rejection, execution, and expiry.
+
+## Local Environment Configuration
 
 Create a `.env` file in the project root.
 
 ```dotenv
 RPC_URL=http://127.0.0.1:8545
 PORT=3000
-ADMIN_A_PRIVATE_KEY=LOCAL_HARDHAT_ACCOUNT_0_KEY
-ADMIN_B_PRIVATE_KEY=LOCAL_HARDHAT_ACCOUNT_1_KEY
-EXECUTOR_PRIVATE_KEY=LOCAL_HARDHAT_ACCOUNT_2_KEY
+
+ADMIN_A_PRIVATE_KEY=
+ADMIN_B_PRIVATE_KEY=
+EXECUTOR_PRIVATE_KEY=
 ```
 
-Use the corresponding local Hardhat development account keys.
+Populate the three private-key variables with the corresponding local development account keys.
 
-The keys must match the addresses stored in `deployments/local.json`.
+The accounts must match the addresses registered in `deployments/local.json`.
 
-**Security warning:** The default Hardhat development accounts have publicly known private keys. They must only be used for local testing and must never receive real funds or be reused on a live network.
+> **Security warning:** Use only local Hardhat development accounts for this demonstration. Their default private keys are publicly known. Never use these keys with real funds or on a live network. Never commit your `.env` file or expose private keys in screenshots or documentation.
 
-The `.env` file must not be committed to Git or included in project submissions.
+## Running ChangeShield Locally
 
-### 10. Running the Application
+The application requires a local blockchain, a deployed smart contract, and the backend server.
 
-The application requires two long-running services.
-
-**Terminal 1: Start the local blockchain**
-
-From the project root:
+### Terminal 1 — Start the Local Blockchain
 
 ```powershell
 npx hardhat node
 ```
 
-Keep this terminal running.
+Keep the blockchain terminal running.
 
-**Terminal 2: Deploy the smart contract**
+### Terminal 2 — Deploy the Smart Contract
 
-Open another terminal:
+Deploy the contract using the local network configuration:
 
 ```powershell
 npx hardhat run scripts/deploy-changeshield.ts --network localhost
 ```
 
-This deploys ChangeShield and registers the second administrator. Deployment details are saved to `deployments/local.json`.
+The deployment script deploys the ChangeShield contract, registers the second administrator, and generates:
 
-**Terminal 3: Start the backend**
+```text
+deployments/local.json
+```
+
+This file contains the local contract address, network information, and administrator and executor addresses required by the backend.
+
+**Note:** The deployment command requires a `localhost` network entry pointing to `http://127.0.0.1:8545` in the Hardhat configuration. If your local network is configured under a different name, use that network name instead.
+
+### Terminal 3 — Start the Backend
 
 ```powershell
 node .\backend\server.mjs
 ```
 
-The Express API runs at:
+The backend starts at:
 
 ```text
 http://127.0.0.1:3000
 ```
 
-**Important:** Restarting the Hardhat node resets the local blockchain. The smart contract must be deployed again, and the backend must be restarted using the updated deployment information.
+Open the same address in your browser to access the ChangeShield dashboard.
 
-### 11. Backend API Endpoints
+### Important Runtime Notes
 
-| Method | Endpoint | Description |
+- Keep the local blockchain running while using the dashboard.
+- The backend depends on the deployed contract information and generated Hardhat artifacts.
+- Restarting the Hardhat node resets its local blockchain state.
+- After a reset, redeploy the contract and restart the backend with the updated deployment information.
+- `Run-ChangeShield-Demo.ps1` is an optional script for automating demonstration scenarios; it is not required to launch the dashboard.
+
+## Backend API Reference
+
+The Express backend exposes the following endpoints:
+
+| Method | Endpoint | Purpose |
 |---|---|---|
-| GET | `/api/health` | Check blockchain connectivity |
-| GET | `/api/config` | Retrieve current configuration |
-| GET | `/api/changes` | Retrieve all proposals |
-| GET | `/api/changes/:id` | Retrieve an individual proposal |
-| POST | `/api/changes` | Create a configuration-change proposal |
-| POST | `/api/changes/:id/approve` | Approve a pending proposal |
-| POST | `/api/changes/:id/reject` | Reject a pending proposal |
-| POST | `/api/changes/:id/execute` | Execute an approved proposal |
-| POST | `/api/changes/:id/expire` | Expire an overdue proposal |
-| GET | `/api/audit` | Retrieve blockchain audit history |
+| `GET` | `/api/health` | Check backend and blockchain connectivity. |
+| `GET` | `/api/config` | Retrieve the active configuration. |
+| `GET` | `/api/changes` | Retrieve all configuration-change proposals. |
+| `GET` | `/api/changes/:id` | Retrieve a specific proposal. |
+| `POST` | `/api/changes` | Submit a new configuration-change proposal. |
+| `POST` | `/api/changes/:id/approve` | Approve a pending proposal. |
+| `POST` | `/api/changes/:id/reject` | Reject a pending proposal. |
+| `POST` | `/api/changes/:id/execute` | Execute an approved proposal. |
+| `POST` | `/api/changes/:id/expire` | Expire an overdue proposal. |
+| `GET` | `/api/audit` | Retrieve blockchain audit events. |
 
-### 12. Automated Testing
+### Example Proposal Request
 
-The ChangeShield test suite covers:
+```json
+{
+  "reason": "Reduce the permitted number of failed login attempts",
+  "validForSeconds": 3600,
+  "patch": {
+    "maxLoginAttempts": 3
+  }
+}
+```
 
-1. Successful proposal creation.
+### Supported Configuration Parameters
+
+| Parameter | Data Type | Permitted Values |
+|---|---|---|
+| `requireMFA` | Boolean | `true` or `false` |
+| `maxLoginAttempts` | Integer | 1–20 |
+| `firewallMode` | String | `standard`, `strict`, `restricted` |
+
+Unsupported parameters and invalid values are rejected by the backend before a blockchain proposal is created.
+
+## Smart Contract Events
+
+The ChangeShield contract emits events to provide a traceable record of important operations.
+
+| Event | Purpose |
+|---|---|
+| `AdminUpdated` | Records administrator permission changes. |
+| `ExecutorUpdated` | Records executor updates. |
+| `ChangeProposed` | Records creation of a configuration-change proposal. |
+| `ChangeApproved` | Records approval of a proposal. |
+| `ChangeRejected` | Records rejection of a proposal. |
+| `ChangeExpired` | Records expiry of a proposal. |
+| `ChangeExecuted` | Records successful execution. |
+
+The backend retrieves these events through the `/api/audit` endpoint.
+
+## Testing
+
+The smart-contract test suite validates the principal authorization and proposal lifecycle rules.
+
+It covers:
+
+1. Successful proposal creation by an administrator.
 2. Prevention of self-approval.
 3. Approval by a different authorized administrator.
-4. Rejection of unauthorized proposals.
-5. Configuration hash verification.
-6. Unauthorized approval prevention.
-7. Proposal rejection.
-8. Unauthorized execution prevention.
+4. Rejection of proposals from unauthorized accounts.
+5. Configuration hash mismatch prevention and valid execution.
+6. Prevention of unauthorized approval.
+7. Independent proposal rejection.
+8. Prevention of unauthorized execution.
 9. Prevention of repeated execution.
-10. Proposal expiry.
+10. Proposal expiry after its deadline.
 
-Execute:
+Run the tests with:
 
 ```powershell
 npx hardhat test
 ```
 
-The latest verified result after removing the Hardhat Counter sample tests was 10 passing ChangeShield Mocha tests.
+## Security Scope and Current Limitations
 
-### 13. Security Considerations and Limitations
+ChangeShield is an academic working prototype intended to demonstrate blockchain-backed governance for critical configuration changes.
 
-- Configuration contents and supplementary metadata are stored off-chain.
-- Cryptographic hashes and smart-contract event records are stored on-chain.
-- The smart contract enforces authorization based on blockchain account addresses.
-- The current implementation uses local development signing keys and is intended for a local demonstration.
-- The current backend does not yet provide production-grade independent human authentication for the administrator API operations.
-- Blockchain execution records authorization and the executor's transaction; it does not independently establish that an external production server applied the configuration.
-- A production deployment would require secure key management, authenticated API access, independent administrator transaction signing, and additional operational safeguards.
+The current implementation has the following scope and limitations:
 
-### 14. Future Enhancements
+- The blockchain records proposal state, configuration hashes, authorization actions, and execution events.
+- The active configuration and supplementary proposal metadata are maintained off-chain.
+- Authorization is based on configured blockchain accounts and backend-held signing keys.
+- The current prototype does not provide production-grade independent human authentication or a complete enterprise identity-management system.
+- The demonstration configuration is a local JSON file; the project does not directly modify a real firewall, cloud infrastructure, or production authentication service.
+- Blockchain records provide a tamper-evident transaction history, but do not independently prove that an external production system applied a configuration successfully.
 
-- React-based administrator dashboard.
+A production deployment would require stronger key management, independently authenticated administrator approvals, secure API access, persistent storage, operational monitoring, and integration with actual configuration-management infrastructure.
+
+## Future Enhancements
+
+Potential extensions include:
+
 - Wallet-based independent administrator signing.
-- Stronger administrator authentication.
-- Proposal-specific audit views and transaction receipts.
-- Database-backed metadata management.
-- Integration with real configuration-management systems.
-- Additional security and performance evaluation.
+- Stronger administrator identity verification and authentication.
+- Database-backed proposal and metadata management.
+- Integration with real cloud and security configuration systems.
+- Expanded audit reporting and transaction receipt views.
+- Additional security testing and performance evaluation.
 
-### 15. Project Objective
+## Project Objective
 
-ChangeShield demonstrates how Solidity smart contracts and blockchain-backed authorization can be used to strengthen the security, accountability, and auditability of critical configuration changes through a two-person approval mechanism.
+ChangeShield explores how blockchain technology and smart-contract-based authorization can strengthen the governance of sensitive security configuration changes.
+
+By combining independent administrative approval, cryptographic integrity verification, controlled execution, and blockchain-backed audit records, the project demonstrates a structured approach to improving accountability and reducing the risk of unilateral configuration changes.
+
+---
+
+**Developed as an academic project in Blockchain and Cybersecurity.**
