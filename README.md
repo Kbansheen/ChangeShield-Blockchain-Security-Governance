@@ -1,4 +1,4 @@
-# ChangeShield
+﻿# ChangeShield
 
 ### Blockchain-Based Security Configuration Change Governance
 
@@ -44,7 +44,7 @@ The project currently runs as a local prototype using a Hardhat development bloc
 ChangeShield consists of three main layers.
 
 ### 1. Smart Contract Layer
-**Solidity · Hardhat**
+**Solidity Â· Hardhat**
 
 - Maintains administrator and executor permissions.
 - Registers configuration-change proposals.
@@ -54,7 +54,7 @@ ChangeShield consists of three main layers.
 - Emits events for important operations.
 
 ### 2. Backend Layer
-**Node.js · Express.js · ethers.js**
+**Node.js Â· Express.js Â· ethers.js**
 
 - Provides REST API endpoints.
 - Validates incoming configuration-change requests.
@@ -65,7 +65,7 @@ ChangeShield consists of three main layers.
 - Retrieves blockchain audit events.
 
 ### 3. Configuration and Metadata Layer
-**JSON · Local Hardhat Blockchain**
+**JSON Â· Local Hardhat Blockchain**
 
 - `config.json` stores the active demonstration configuration.
 - `changes.json` stores supplementary proposal information off-chain.
@@ -135,41 +135,41 @@ These scenarios demonstrate both successful authorization and the system's abili
 
 ```text
 ChangeShield/
-│
-├── contracts/
-│   └── ChangeShield.sol
-│
-├── scripts/
-│   └── deploy-changeshield.ts
-│
-├── test/
-│   └── ChangeShield.ts
-│
-├── backend/
-│   ├── server.mjs
-│   ├── public/
-│   │   ├── index.html
-│   │   ├── styles.css
-│   │   └── app.js
-│   └── data/
-│       └── config.json
-│
-├── Run-ChangeShield-Demo.ps1
-├── hardhat.config.ts
-├── package.json
-├── package-lock.json
-├── tsconfig.json
-├── .gitignore
-└── README.md
+â”‚
+â”œâ”€â”€ contracts/
+â”‚   â””â”€â”€ ChangeShield.sol
+â”‚
+â”œâ”€â”€ scripts/
+â”‚   â””â”€â”€ deploy-changeshield.ts
+â”‚
+â”œâ”€â”€ test/
+â”‚   â””â”€â”€ ChangeShield.ts
+â”‚
+â”œâ”€â”€ backend/
+â”‚   â”œâ”€â”€ server.mjs
+â”‚   â”œâ”€â”€ public/
+â”‚   â”‚   â”œâ”€â”€ index.html
+â”‚   â”‚   â”œâ”€â”€ styles.css
+â”‚   â”‚   â””â”€â”€ app.js
+â”‚   â””â”€â”€ data/
+â”‚       â””â”€â”€ config.json
+â”‚
+â”œâ”€â”€ Run-ChangeShield-Demo.ps1
+â”œâ”€â”€ hardhat.config.ts
+â”œâ”€â”€ package.json
+â”œâ”€â”€ package-lock.json
+â”œâ”€â”€ tsconfig.json
+â”œâ”€â”€ .gitignore
+â””â”€â”€ README.md
 ```
 
 **Generated locally when the application is deployed or run:**
 
-- `artifacts/` and `cache/` — generated Hardhat build files.
-- `deployments/local.json` — local deployment information.
-- `backend/data/changes.json` — supplementary proposal metadata.
-- `.env` — local environment configuration.
-- `node_modules/` — installed dependencies.
+- `artifacts/` and `cache/` â€” generated Hardhat build files.
+- `deployments/local.json` â€” local deployment information.
+- `backend/data/changes.json` â€” supplementary proposal metadata.
+- `.env` â€” local environment configuration.
+- `node_modules/` â€” installed dependencies.
 
 These local files are excluded from version control where appropriate.
 
@@ -239,7 +239,7 @@ The accounts must match the addresses registered in `deployments/local.json`.
 
 The application requires a local blockchain, a deployed smart contract, and the backend server.
 
-### Terminal 1 — Start the Local Blockchain
+### Terminal 1 â€” Start the Local Blockchain
 
 ```powershell
 npx hardhat node
@@ -247,7 +247,7 @@ npx hardhat node
 
 Keep the blockchain terminal running.
 
-### Terminal 2 — Deploy the Smart Contract
+### Terminal 2 â€” Deploy the Smart Contract
 
 Deploy the contract using the local network configuration:
 
@@ -263,9 +263,9 @@ deployments/local.json
 
 This file contains the local contract address, network information, and administrator and executor addresses required by the backend.
 
-**Note:** The deployment command requires a `localhost` network entry pointing to `http://127.0.0.1:8545` in the Hardhat configuration. If your local network is configured under a different name, use that network name instead.
+The `localhost` network is configured in `hardhat.config.ts` to connect to the local Hardhat JSON-RPC node at `http://127.0.0.1:8545` (chain ID `31337`). It uses the unlocked development accounts provided by the running Hardhat node (`accounts: "remote"`). This setup was verified by successfully deploying ChangeShield with the command above.
 
-### Terminal 3 — Start the Backend
+### Terminal 3 â€” Start the Backend
 
 ```powershell
 node .\backend\server.mjs
@@ -321,7 +321,7 @@ The Express backend exposes the following endpoints:
 | Parameter | Data Type | Permitted Values |
 |---|---|---|
 | `requireMFA` | Boolean | `true` or `false` |
-| `maxLoginAttempts` | Integer | 1–20 |
+| `maxLoginAttempts` | Integer | 1â€“20 |
 | `firewallMode` | String | `standard`, `strict`, `restricted` |
 
 Unsupported parameters and invalid values are rejected by the backend before a blockchain proposal is created.
